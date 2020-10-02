@@ -1,6 +1,6 @@
 #!/bin/sh -l
 
-set -ex
+set -x
 
 cd "${GITHUB_WORKSPACE}"
 
@@ -18,8 +18,10 @@ if "${INPUT_ENABLE_PHPSTAN}"; then
       -fail-on-error=${INPUT_FAIL_ON_ERROR} \
       -level="${INPUT_LEVEL}" \
       ${INPUT_REVIEWDOG_ARGS}
+  PHPSTAN_STATUS=$?
 else
   echo 'Disabled PHPStan'
+  PHPSTAN_STATUS=0
 fi
 
 if "${INPUT_ENABLE_PHPMD}"; then
@@ -33,8 +35,10 @@ if "${INPUT_ENABLE_PHPMD}"; then
       -fail-on-error=${INPUT_FAIL_ON_ERROR} \
       -level="${INPUT_LEVEL}" \
       ${INPUT_REVIEWDOG_ARGS}
+  PHPMD_STATUS=$?
 else
   echo 'Disabled PHPMD'
+  PHPMD_STATUS=0
 fi
 
 if "${INPUT_ENABLE_PHPCS}"; then
@@ -48,8 +52,10 @@ if "${INPUT_ENABLE_PHPCS}"; then
       -fail-on-error=${INPUT_FAIL_ON_ERROR} \
       -level="${INPUT_LEVEL}" \
       ${INPUT_REVIEWDOG_ARGS}
+  PHPCS_STATUS=$?
 else
   echo 'Disabled PHP_CodeSniffer'
+  PHPCS_STATUS=0
 fi
 
 if "${INPUT_ENABLE_PHINDER}"; then
@@ -63,6 +69,17 @@ if "${INPUT_ENABLE_PHINDER}"; then
       -fail-on-error=${INPUT_FAIL_ON_ERROR} \
       -level="${INPUT_LEVEL}" \
       ${INPUT_REVIEWDOG_ARGS}
+  PHINDER_STATUS=$?
 else
   echo 'Disabled Phinder'
+  PHINDER_STATUS=0
+fi
+
+if [ ${PHPSTAN_STATUS} -ne 0 ] || [ ${PHPMD_STATUS} -ne 0 ] || [ ${PHPCS_STATUS} -ne 0 ] || [ ${PHINDER_STATUS} -ne 0 ]; then
+  printf '\033[31m%s\033[m\n' 'Some analysis is failing. Please fix the code.'
+  exit 1
+else
+  printf '\033[32m%s\033[m\n' 'All analyzes completed successfully.'
+  echo -e "\e[32m\e[m"
+  exit 0
 fi
