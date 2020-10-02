@@ -1,7 +1,7 @@
 # PHP Analyse dog
 
 ## Description
-Run PHP code analysis on pull request and review comment via reviewdog.
+Run PHP code analyse on pull request and review comment via reviewdog.
 
 ## Inputs
 name | description | required | default
@@ -24,7 +24,7 @@ workdir|The directory from which to look for and run commands|false|'.'
 
 ## Usage on Github Actions
 ```
-uses: shiromegane/php-analysis-dog@v1
+uses: shiromegane/php-analyse-dog@v0.1.1
 with:
   github_token: ${{ secrets.GITHUB_TOKEN }}
 ```
