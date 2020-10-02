@@ -8,7 +8,8 @@ export REVIEWDOG_GITHUB_API_TOKEN="${INPUT_GITHUB_TOKEN}"
 
 cd "${GITHUB_WORKSPACE}/${INPUT_WORKDIR}" || exit 1
 
-if [ ${INPUT_ENABLE_PHPSTAN} ]; then
+if "${INPUT_ENABLE_PHPSTAN}"; then
+  echo 'Enabled PHPStan. Starting analyse...'
   phpstan ${INPUT_PHPSTAN_ARGS} \
     | reviewdog -f=phpstan \
       -name="PHPStan" \
@@ -21,7 +22,8 @@ else
   echo 'Disabled PHPStan'
 fi
 
-if [ ${INPUT_ENABLE_PHPMD} ]; then
+if "${INPUT_ENABLE_PHPMD}"; then
+  echo 'Enabled PHPMD. Starting analyse...'
   phpmd ${INPUT_PHPMD_ARGS} \
     | jq -r '.errors|to_entries[]|.value.fileName as $path|.value.message as $msg|"\($path):\($msg)"|match(", line: (\\d)").captures[].string as $line|match(", col: (\\d)").captures[].string as $col|"\($path):\($line):\($col):`Syntax error`<br>\($msg)"|gsub(", line:(.*)";"")' \
     | reviewdog -efm="%f:%l:%c:%m" \
@@ -35,7 +37,8 @@ else
   echo 'Disabled PHPMD'
 fi
 
-if [ ${INPUT_ENABLE_PHPCS} ]; then
+if "${INPUT_ENABLE_PHPCS}"; then
+  echo 'Enabled PHP_CodeSniffer. Starting analyse...'
   phpcs ${INPUT_PHPCS_ARGS} \
     | jq -r '.files|to_entries[]|.key as $path|.value.messages[] as $msg|"\($path):\($msg.line):\($msg.column):`\($msg.source)`<br>\($msg.message)"' \
     | reviewdog -efm="%f:%l:%c:%m" \
@@ -49,7 +52,8 @@ else
   echo 'Disabled PHP_CodeSniffer'
 fi
 
-if [ ${INPUT_ENABLE_PHPINDER} ]; then
+if "${INPUT_ENABLE_PHPINDER}"; then
+  echo 'Enabled Phinder. Starting analyse...'
   phinder ${INPUT_PHINDER_ARGS} \
     | jq -r '.result|to_entries[]|.value.path as $path|.value.location.start[0] as $line|.value.location.start[1] as $col|.value.rule as $rule|"\($path):\($line):\($col):`\($rule.id)`<br>\($rule.message)"' \
     | reviewdog -efm="%f:%l:%c:%m" \
