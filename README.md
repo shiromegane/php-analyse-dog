@@ -24,7 +24,7 @@ workdir|The directory from which to look for and run commands|false|'.'
 
 ## Usage on Github Actions
 ```
-uses: shiromegane/php-analyse-dog@v0.1.1
+uses: shiromegane/php-analyse-dog@v0.1.2
 with:
   github_token: ${{ secrets.GITHUB_TOKEN }}
 ```
