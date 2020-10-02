@@ -16,7 +16,7 @@ inputs:
     default: 'added'
   fail_on_error:
     description: 'Exit code for reviewdog when errors are found [true, false]'
-    default: 'true'
+    default: true
   reviewdog_args:
     description: 'Additional reviewdog options'
     default: ''

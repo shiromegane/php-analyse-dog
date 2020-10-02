@@ -10,9 +10,9 @@ if [ ${INPUT_ENABLE_PHPSTAN} ]; then
   phpstan ${INPUT_PHPSTAN_ARGS} \
     | reviewdog -f=phpstan \
       -name="PHPStan" \
-      -reporter="${INPUT_REPORTER}" \
-      -filter-mode="${INPUT_FILTER_MODE}" \
-      -fail-on-error="${INPUT_FAIL_ON_ERROR}" \
+      -reporter=${INPUT_REPORTER} \
+      -filter-mode=${INPUT_FILTER_MODE} \
+      -fail-on-error=${INPUT_FAIL_ON_ERROR} \
       -level="${INPUT_LEVEL}" \
       ${INPUT_REVIEWDOG_ARGS}
 else
@@ -22,11 +22,11 @@ fi
 if [ ${INPUT_ENABLE_PHPMD} ]; then
   phpmd ${INPUT_PHPMD_ARGS} \
     | jq -r '.errors|to_entries[]|.value.fileName as $path|.value.message as $msg|"\($path):\($msg)"|match(", line: (\\d)").captures[].string as $line|match(", col: (\\d)").captures[].string as $col|"\($path):\($line):\($col):`Syntax error`<br>\($msg)"|gsub(", line:(.*)";"")' \
-    | reviewdog -f=phpstan \
+    | reviewdog -efm="%f:%l:%c:%m" \
       -name="PHPMD" \
-      -reporter="${INPUT_REPORTER}" \
-      -filter-mode="${INPUT_FILTER_MODE}" \
-      -fail-on-error="${INPUT_FAIL_ON_ERROR}" \
+      -reporter=${INPUT_REPORTER} \
+      -filter-mode=${INPUT_FILTER_MODE} \
+      -fail-on-error=${INPUT_FAIL_ON_ERROR} \
       -level="${INPUT_LEVEL}" \
       ${INPUT_REVIEWDOG_ARGS}
 else
@@ -38,9 +38,9 @@ if [ ${INPUT_ENABLE_PHPCS} ]; then
     | jq -r '.files|to_entries[]|.key as $path|.value.messages[] as $msg|"\($path):\($msg.line):\($msg.column):`\($msg.source)`<br>\($msg.message)"' \
     | reviewdog -efm="%f:%l:%c:%m" \
       -name="PHP_CodeSniffer" \
-      -reporter="${INPUT_REPORTER}" \
-      -filter-mode="${INPUT_FILTER_MODE}" \
-      -fail-on-error="${INPUT_FAIL_ON_ERROR}" \
+      -reporter=${INPUT_REPORTER} \
+      -filter-mode=${INPUT_FILTER_MODE} \
+      -fail-on-error=${INPUT_FAIL_ON_ERROR} \
       -level="${INPUT_LEVEL}" \
       ${INPUT_REVIEWDOG_ARGS}
 else
@@ -52,9 +52,9 @@ if [ ${INPUT_ENABLE_PHPINDER} ]; then
     | jq -r '.result|to_entries[]|.value.path as $path|.value.location.start[0] as $line|.value.location.start[1] as $col|.value.rule as $rule|"\($path):\($line):\($col):`\($rule.id)`<br>\($rule.message)"' \
     | reviewdog -efm="%f:%l:%c:%m" \
       -name="Phinder" \
-      -reporter="${INPUT_REPORTER}" \
-      -filter-mode="${INPUT_FILTER_MODE}" \
-      -fail-on-error="${INPUT_FAIL_ON_ERROR}" \
+      -reporter=${INPUT_REPORTER} \
+      -filter-mode=${INPUT_FILTER_MODE} \
+      -fail-on-error=${INPUT_FAIL_ON_ERROR} \
       -level="${INPUT_LEVEL}" \
       ${INPUT_REVIEWDOG_ARGS}
 else
