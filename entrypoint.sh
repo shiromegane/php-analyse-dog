@@ -1,6 +1,6 @@
 #!/bin/sh -l
 
-set -x
+set -ex
 
 cd "${GITHUB_WORKSPACE}"
 
