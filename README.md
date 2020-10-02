@@ -19,7 +19,7 @@ enable_phinder|Enable Phinder [true, false]|false|false
 phpstan_args|PHPStan command args|false|'analyse --error-format=raw --no-progress .'
 phpmd_args|PHPMD command args|false|'. json cleancode,codesize,controversial,design,naming,unusedcode'
 phpcs_args|PHP_CodeSniffer command args|false|'--report=json -q .'
-phinder_args|Phinder command args|false|'-f "json" .'
+phinder_args|Phinder command args|false|'find -f "json" .'
 workdir|The directory from which to look for and run commands|false|'.'
 
 ## Usage on Github Actions

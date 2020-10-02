@@ -43,7 +43,7 @@ inputs:
     default: '--report=json -q .'
   phinder_args:
     description: 'Phinder command args'
-    default: '-f "json" .'
+    default: 'find -f "json" .'
   workdir:
     description: 'The directory from which to look for and run commands'
     default: '.'

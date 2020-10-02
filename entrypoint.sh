@@ -40,7 +40,7 @@ fi
 if "${INPUT_ENABLE_PHPCS}"; then
   echo 'Enabled PHP_CodeSniffer. Starting analyse...'
   phpcs ${INPUT_PHPCS_ARGS} \
-    | jq -r '.files|to_entries[]|.key as $path|.value.messages[] as $msg|"\($path):\($msg.line):\($msg.column):`\($msg.source)`<br>\($msg.message)"' \
+    | jq -r '.files|to_entries[]|.key as $path|.value.messages[] as $msg|"\($path):\($msg.line):\($msg.column):**\($msg.source)**\n`\($msg.message)`"' \
     | reviewdog -efm="%f:%l:%c:%m" \
       -name="PHP_CodeSniffer" \
       -reporter=${INPUT_REPORTER} \
