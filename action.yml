@@ -1,11 +1,10 @@
-name: 'PHP analysis with reviewdog'
+name: 'PHP Analysis dog'
 description: 'Run PHP code analysis on pull request and review comment via reviewdog.'
 author: 'shiromegane'
 inputs:
   github_token:
     description: 'GITHUB_TOKEN.'
     required: true
-    default: ${{ github.token }}
   level:
     description: 'Report level for reviewdog [info, warning, error]'
     default: 'error'

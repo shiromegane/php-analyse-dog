@@ -1,15 +1,30 @@
 # PHP Analysis dog
 
-このアクションはPHP静的解析を実行します
+## Description
+Run PHP code analysis on pull request and review comment via reviewdog.
 
-## 入力
+## Inputs
+name | description | required | default
+---|---|---|---
+github_token|GITHUB_TOKEN|true|-
+level|Report level for reviewdog [info, warning, error]|false|'error'
+reporter|Reporter of the rebiewdog command [github-pr-check, github-pr-review]|false|'github-pr-check'
+filter_mode|Filtering mode for the reviewdog command [added, diff_context, file, nofilter]|false|'added'
+fail_on_error|Exit code for reviewdog when errors are found [true, false]|false|'true'
+reviewdog_args|Additional reviewdog options|false|''
+enable_phpstan|Enable PHPStan [true, false]|false|true
+enable_phpmd|Enable PHPMD [true, false]|false|false
+enable_phpcs|Enable PHP_CodeSniffer [true, false]|false|true
+enable_phinder|Enable Phinder [true, false]|false|false
+phpstan_args|PHPStan command args|false|'analyse --error-format=raw --no-progress .'
+phpmd_args|PHPMD command args|false|'. json cleancode,codesize,controversial,design,naming,unusedcode'
+phpcs_args|PHP_CodeSniffer command args|false|'--report=json -q .'
+phinder_args|Phinder command args|false|'-f "json" .'
+workdir|The directory from which to look for and run commands|false|'.'
 
-### `github_token`
-
-**必須** GITHUB_TOKEN
-
-## 使用例
-
+## Usage on Github Actions
+```
 uses: shiromegane/php-analysis-dog@v1
 with:
   github_token: ${{ secrets.GITHUB_TOKEN }}
+```
