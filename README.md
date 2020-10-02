@@ -8,7 +8,7 @@ name | description | required | default
 ---|---|---|---
 github_token|GITHUB_TOKEN|true|-
 level|Report level for reviewdog [info, warning, error]|false|'error'
-reporter|Reporter of the rebiewdog command [github-pr-check, github-pr-review]|false|'github-pr-check'
+reporter|Reporter of the rebiewdog command [github-pr-check, github-pr-review]|false|'github-pr-review'
 filter_mode|Filtering mode for the reviewdog command [added, diff_context, file, nofilter]|false|'added'
 fail_on_error|Exit code for reviewdog when errors are found [true, false]|false|'true'
 reviewdog_args|Additional reviewdog options|false|''
