@@ -1,4 +1,4 @@
-name: 'PHP Analysis dog'
+name: 'PHP Analyse dog'
 description: 'Run PHP code analysis on pull request and review comment via reviewdog.'
 author: 'shiromegane'
 inputs:

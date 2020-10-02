@@ -1,4 +1,4 @@
-# PHP Analysis dog
+# PHP Analyse dog
 
 ## Description
 Run PHP code analysis on pull request and review comment via reviewdog.
