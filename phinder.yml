@@ -1,0 +1,9 @@
+rule:
+  - id: Do not use var_dump(...)
+    pattern: var_dump(...)
+    message: var_dump()を削除してください
+    justification: デバッグ中の場合のみ
+  - id: Do not use error_log(...)
+    pattern: error_log(...)
+    message: error_log()を削除してください
+    justification: デバッグ中の場合のみ

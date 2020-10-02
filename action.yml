@@ -18,26 +18,35 @@ inputs:
   fail_on_error:
     description: 'Exit code for reviewdog when errors are found [true, false]'
     default: 'true'
-  reviewdog_options:
+  reviewdog_args:
     description: 'Additional reviewdog options'
     default: ''
-  enable_phpmd:
-    description: 'Enable PHPMD [true, false]'
-    default: true
   enable_phpstan:
     description: 'Enable PHPStan [true, false]'
     default: true
+  enable_phpmd:
+    description: 'Enable PHPMD [true, false]'
+    default: false
   enable_phpcs:
     description: 'Enable PHP_CodeSniffer [true, false]'
     default: true
   enable_phinder:
     description: 'Enable Phinder [true, false]'
-    default: true
-  phpcs_options:
-    description: 'PHP_CodeSniffer command options'
-    default: '.'
+    default: false
+  phpstan_args:
+    description: 'PHPStan command args'
+    default: 'analyse --error-format=raw --no-progress .'
+  phpmd_args:
+    description: 'PHPMD command args'
+    default: '. json cleancode,codesize,controversial,design,naming,unusedcode'
+  phpcs_args:
+    description: 'PHP_CodeSniffer command args'
+    default: '--report=json -q .'
+  phinder_args:
+    description: 'Phinder command args'
+    default: '-f "json" .'
   workdir:
-    description: "The directory from which to look for and run commands"
+    description: 'The directory from which to look for and run commands'
     default: '.'
 runs:
   using: 'docker'
