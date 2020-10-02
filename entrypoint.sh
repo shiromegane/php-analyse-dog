@@ -9,69 +9,69 @@ export REVIEWDOG_GITHUB_API_TOKEN="${INPUT_GITHUB_TOKEN}"
 cd "${GITHUB_WORKSPACE}/${INPUT_WORKDIR}" || exit 1
 
 if "${INPUT_ENABLE_PHPSTAN}"; then
-  echo 'Enabled PHPStan. Starting analyse...'
+  echo 'Starting analyse by "PHPStan"'
   phpstan ${INPUT_PHPSTAN_ARGS} \
-    | reviewdog -f=phpstan \
-      -name="PHPStan" \
+    | reviewdog -name="PHPStan" -f=phpstan \
       -reporter=${INPUT_REPORTER} \
       -filter-mode=${INPUT_FILTER_MODE} \
       -fail-on-error=${INPUT_FAIL_ON_ERROR} \
-      -level="${INPUT_LEVEL}" \
+      -level=${INPUT_LEVEL} \
       ${INPUT_REVIEWDOG_ARGS}
   PHPSTAN_STATUS=$?
+  echo 'Finished analyse by "PHPStan"'
 else
-  echo 'Disabled PHPStan'
+  echo 'Analyse by "PHPStan" is disabled'
   PHPSTAN_STATUS=0
 fi
 
 if "${INPUT_ENABLE_PHPMD}"; then
-  echo 'Enabled PHPMD. Starting analyse...'
+  echo 'Starting analyse by "PHPMD"'
   phpmd ${INPUT_PHPMD_ARGS} \
     | jq -r '.errors|to_entries[]|.value.fileName as $path|.value.message as $msg|"\($path):\($msg)"|match(", line: (\\d)").captures[].string as $line|match(", col: (\\d)").captures[].string as $col|"\($path):\($line):\($col):`Syntax error`<br>\($msg)"|gsub(", line:(.*)";"")' \
-    | reviewdog -efm="%f:%l:%c:%m" \
-      -name="PHPMD" \
+    | reviewdog -name="PHPMD" -efm="%f:%l:%c:%m" \
       -reporter=${INPUT_REPORTER} \
       -filter-mode=${INPUT_FILTER_MODE} \
       -fail-on-error=${INPUT_FAIL_ON_ERROR} \
-      -level="${INPUT_LEVEL}" \
+      -level=${INPUT_LEVEL} \
       ${INPUT_REVIEWDOG_ARGS}
   PHPMD_STATUS=$?
+  echo 'Finished analyse by "PHPMD"'
 else
-  echo 'Disabled PHPMD'
+  echo 'Analyse by "PHPMD" is disabled'
   PHPMD_STATUS=0
 fi
 
 if "${INPUT_ENABLE_PHPCS}"; then
-  echo 'Enabled PHP_CodeSniffer. Starting analyse...'
+  echo 'Starting analyse by "PHP_CodeSniffer"'
   phpcs ${INPUT_PHPCS_ARGS} \
     | jq -r '.files|to_entries[]|.key as $path|.value.messages[] as $msg|"\($path):\($msg.line):\($msg.column):`\($msg.source)`<br>\($msg.message)"' \
-    | reviewdog -efm="%f:%l:%c:%m" \
-      -name="PHP_CodeSniffer" \
+    | reviewdog -name="PHP_CodeSniffer" -efm="%f:%l:%c:%m" \
       -reporter=${INPUT_REPORTER} \
       -filter-mode=${INPUT_FILTER_MODE} \
       -fail-on-error=${INPUT_FAIL_ON_ERROR} \
-      -level="${INPUT_LEVEL}" \
+      -level=${INPUT_LEVEL} \
       ${INPUT_REVIEWDOG_ARGS}
   PHPCS_STATUS=$?
+  echo 'Finished analyse by "PHP_CodeSniffer"'
 else
-  echo 'Disabled PHP_CodeSniffer'
+  echo 'Analyse by "PHP_CodeSniffer" is disabled'
   PHPCS_STATUS=0
 fi
 
 if "${INPUT_ENABLE_PHINDER}"; then
-  echo 'Enabled Phinder. Starting analyse...'
+  echo 'Starting analyse by "Phinder"'
   phinder ${INPUT_PHINDER_ARGS} \
     | jq -r '.result|to_entries[]|.value.path as $path|.value.location.start[0] as $line|.value.location.start[1] as $col|.value.rule as $rule|"\($path):\($line):\($col):`\($rule.id)`<br>\($rule.message)"' \
-    | reviewdog -efm="%f:%l:%c:%m" \
-      -name="Phinder" \
+    | reviewdog -name="Phinder" -efm="%f:%l:%c:%m" \
       -reporter=${INPUT_REPORTER} \
       -filter-mode=${INPUT_FILTER_MODE} \
       -fail-on-error=${INPUT_FAIL_ON_ERROR} \
-      -level="${INPUT_LEVEL}" \
+      -level=${INPUT_LEVEL} \
       ${INPUT_REVIEWDOG_ARGS}
   PHINDER_STATUS=$?
+  echo 'Finished analyse by "Phinder"'
 else
-  echo 'Disabled Phinder'
+  echo 'Analyse by "Phinder" is disabled'
   PHINDER_STATUS=0
 fi
 
@@ -80,6 +80,5 @@ if [ ${PHPSTAN_STATUS} -ne 0 ] || [ ${PHPMD_STATUS} -ne 0 ] || [ ${PHPCS_STATUS}
   exit 1
 else
   printf '\033[32m%s\033[m\n' 'All analyzes completed successfully.'
-  echo -e "\e[32m\e[m"
   exit 0
 fi
