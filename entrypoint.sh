@@ -40,7 +40,7 @@ fi
 if "${INPUT_ENABLE_PHPCS}"; then
   echo 'Enabled PHP_CodeSniffer. Starting analyse...'
   phpcs ${INPUT_PHPCS_ARGS} \
-    | jq -r '.files|to_entries[]|.key as $path|.value.messages[] as $msg|"\($path):\($msg.line):\($msg.column):**\($msg.source)**\n`\($msg.message)`"' \
+    | jq -r '.files|to_entries[]|.key as $path|.value.messages[] as $msg|"\($path):\($msg.line):\($msg.column):`\($msg.source)`<br>\($msg.message)"' \
     | reviewdog -efm="%f:%l:%c:%m" \
       -name="PHP_CodeSniffer" \
       -reporter=${INPUT_REPORTER} \
@@ -52,7 +52,7 @@ else
   echo 'Disabled PHP_CodeSniffer'
 fi
 
-if "${INPUT_ENABLE_PHPINDER}"; then
+if "${INPUT_ENABLE_PHINDER}"; then
   echo 'Enabled Phinder. Starting analyse...'
   phinder ${INPUT_PHINDER_ARGS} \
     | jq -r '.result|to_entries[]|.value.path as $path|.value.location.start[0] as $line|.value.location.start[1] as $col|.value.rule as $rule|"\($path):\($line):\($col):`\($rule.id)`<br>\($rule.message)"' \
