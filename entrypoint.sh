@@ -1,13 +1,15 @@
 #!/bin/sh -l
+set -x
 
 cd "${GITHUB_WORKSPACE}"
+cd "${GITHUB_WORKSPACE}/${INPUT_WORKDIR}" || exit 1
+
+printf '\033[34m%s\033[m\n' "Working on $(pwd)"
 
 export REVIEWDOG_GITHUB_API_TOKEN="${INPUT_GITHUB_TOKEN}"
 
-cd "${GITHUB_WORKSPACE}/${INPUT_WORKDIR}" || exit 1
-
 if "${INPUT_ENABLE_PHPSTAN}"; then
-  echo 'Starting analyse by "PHPStan"'
+  printf '\033[33m%s\033[m\n' 'Starting analyse by "PHPStan"'
   phpstan ${INPUT_PHPSTAN_ARGS} \
     | reviewdog -name="PHPStan" -f=phpstan \
       -reporter=${INPUT_REPORTER} \
@@ -16,14 +18,14 @@ if "${INPUT_ENABLE_PHPSTAN}"; then
       -level=${INPUT_LEVEL} \
       ${INPUT_REVIEWDOG_ARGS}
   PHPSTAN_STATUS=$?
-  echo 'Finished analyse by "PHPStan"'
+  printf '\033[33m%s\033[m\n' 'Finished analyse by "PHPStan"'
 else
-  echo 'Analyse by "PHPStan" is disabled'
+  printf '\033[33m%s\033[m\n' 'Analyse by "PHPStan" is disabled'
   PHPSTAN_STATUS=0
 fi
 
 if "${INPUT_ENABLE_PHPMD}"; then
-  echo 'Starting analyse by "PHPMD"'
+  printf '\033[33m%s\033[m\n' 'Starting analyse by "PHPMD"'
   phpmd ${INPUT_PHPMD_ARGS} \
     | jq -r '.errors|to_entries[]|.value.fileName as $path|.value.message as $msg|"\($path):\($msg)"|match(", line: (\\d)").captures[].string as $line|match(", col: (\\d)").captures[].string as $col|"\($path):\($line):\($col):`Syntax error`<br>\($msg)"|gsub(", line:(.*)";"")' \
     | reviewdog -name="PHPMD" -efm="%f:%l:%c:%m" \
@@ -33,14 +35,14 @@ if "${INPUT_ENABLE_PHPMD}"; then
       -level=${INPUT_LEVEL} \
       ${INPUT_REVIEWDOG_ARGS}
   PHPMD_STATUS=$?
-  echo 'Finished analyse by "PHPMD"'
+  printf '\033[33m%s\033[m\n' 'Finished analyse by "PHPMD"'
 else
-  echo 'Analyse by "PHPMD" is disabled'
+  printf '\033[33m%s\033[m\n' 'Analyse by "PHPMD" is disabled'
   PHPMD_STATUS=0
 fi
 
 if "${INPUT_ENABLE_PHPCS}"; then
-  echo 'Starting analyse by "PHP_CodeSniffer"'
+  printf '\033[33m%s\033[m\n' 'Starting analyse by "PHP_CodeSniffer"'
   phpcs ${INPUT_PHPCS_ARGS} \
     | jq -r '.files|to_entries[]|.key as $path|.value.messages[] as $msg|"\($path):\($msg.line):\($msg.column):`\($msg.source)`<br>\($msg.message)"' \
     | reviewdog -name="PHP_CodeSniffer" -efm="%f:%l:%c:%m" \
@@ -50,14 +52,14 @@ if "${INPUT_ENABLE_PHPCS}"; then
       -level=${INPUT_LEVEL} \
       ${INPUT_REVIEWDOG_ARGS}
   PHPCS_STATUS=$?
-  echo 'Finished analyse by "PHP_CodeSniffer"'
+  printf '\033[33m%s\033[m\n' 'Finished analyse by "PHP_CodeSniffer"'
 else
-  echo 'Analyse by "PHP_CodeSniffer" is disabled'
+  printf '\033[33m%s\033[m\n' 'Analyse by "PHP_CodeSniffer" is disabled'
   PHPCS_STATUS=0
 fi
 
 if "${INPUT_ENABLE_PHINDER}"; then
-  echo 'Starting analyse by "Phinder"'
+  printf '\033[33m%s\033[m\n' 'Starting analyse by "Phinder"'
   phinder ${INPUT_PHINDER_ARGS} \
     | jq -r '.result|to_entries[]|.value.path as $path|.value.location.start[0] as $line|.value.location.start[1] as $col|.value.rule as $rule|"\($path):\($line):\($col):`\($rule.id)`<br>\($rule.message)"' \
     | reviewdog -name="Phinder" -efm="%f:%l:%c:%m" \
@@ -67,9 +69,9 @@ if "${INPUT_ENABLE_PHINDER}"; then
       -level=${INPUT_LEVEL} \
       ${INPUT_REVIEWDOG_ARGS}
   PHINDER_STATUS=$?
-  echo 'Finished analyse by "Phinder"'
+  printf '\033[33m%s\033[m\n' 'Finished analyse by "Phinder"'
 else
-  echo 'Analyse by "Phinder" is disabled'
+  printf '\033[33m%s\033[m\n' 'Analyse by "Phinder" is disabled'
   PHINDER_STATUS=0
 fi
 
