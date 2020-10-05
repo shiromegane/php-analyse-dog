@@ -10,6 +10,7 @@ COPY --from=build /tmp/vendor /root/.composer/vendor
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 RUN cp /usr/local/etc/php/php.ini-development /usr/local/etc/php/php.ini
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 RUN wget -O - -q https://raw.githubusercontent.com/reviewdog/reviewdog/master/install.sh | sh -s -- -b /usr/local/bin/ ${REVIEWDOG_VERSION}
 RUN apk --no-cache add jq git
 RUN ln -s /root/.composer/vendor/bin/phpstan /usr/local/bin/phpstan
