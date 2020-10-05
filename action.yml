@@ -47,6 +47,9 @@ inputs:
   workdir:
     description: 'The directory from which to look for and run commands'
     default: '.'
+  dependency_update:
+    description: 'Update dependencies if you have "composer.json" in workdir'
+    default: true
 runs:
   using: 'docker'
   image: 'Dockerfile'

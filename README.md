@@ -21,6 +21,7 @@ phpmd_args|PHPMD command args|false|'. json cleancode,codesize,controversial,des
 phpcs_args|PHP_CodeSniffer command args|false|'--report=json -q .'
 phinder_args|Phinder command args|false|'find -f "json" .'
 workdir|The directory from which to look for and run commands|false|'.'
+dependency_update|Update dependencies if you have "composer.json" in workdir|false|true
 
 ## Usage on Github Actions
 ```

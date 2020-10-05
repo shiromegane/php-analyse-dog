@@ -6,13 +6,17 @@ cd "${GITHUB_WORKSPACE}/${INPUT_WORKDIR}" || exit 1
 
 printf '\033[34m%s\033[m\n' "Working on $(pwd)"
 
-if [ -e composer.json ]; then
+if "${INPUT_DEPENDENCY_UPDATE}" && [ -e composer.json ]; then
   printf '\033[33m%s\033[m\n' '"composer.json" is exist. Run install dependencies.'
   export COMPOSER_MEMORY_LIMIT=-1
   COMPOSER_MEMORY_LIMIT=-1 $(which composer) update
   COMPOSER_STATUS=$?
 else
-  printf '\033[33m%s\033[m\n' '"composer.json" is not exist.'
+  if "${INPUT_DEPENDENCY_UPDATE}"; then
+    printf '\033[33m%s\033[m\n' '"dependency_update" options is false.'
+  else
+    printf '\033[33m%s\033[m\n' '"composer.json" is not exist.'
+  fi
   COMPOSER_STATUS=0
 fi
 
