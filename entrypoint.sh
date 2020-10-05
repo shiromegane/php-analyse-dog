@@ -15,7 +15,7 @@ else
   if "${INPUT_DEPENDENCY_UPDATE}"; then
     printf '\033[33m%s\033[m\n' '"composer.json" is not exist.'
   else
-    printf '\033[33m%s\033[m\n' '"dependency_update" options is false.'
+    printf '\033[33m%s\033[m\n' '"dependency_update" is false.'
   fi
   COMPOSER_STATUS=0
 fi
