@@ -6,6 +6,11 @@ cd "${GITHUB_WORKSPACE}/${INPUT_WORKDIR}" || exit 1
 
 printf '\033[34m%s\033[m\n' "Working on $(pwd)"
 
+if [ -e composer.json ]; then
+  echo '"composer.json" is exist. Run install dependencies.'
+  composer update
+fi
+
 export REVIEWDOG_GITHUB_API_TOKEN="${INPUT_GITHUB_TOKEN}"
 
 if "${INPUT_ENABLE_PHPSTAN}"; then
