@@ -7,8 +7,13 @@ cd "${GITHUB_WORKSPACE}/${INPUT_WORKDIR}" || exit 1
 printf '\033[34m%s\033[m\n' "Working on $(pwd)"
 
 if [ -e composer.json ]; then
-  echo '"composer.json" is exist. Run install dependencies.'
-  composer update
+  printf '\033[33m%s\033[m\n' '"composer.json" is exist. Run install dependencies.'
+  export COMPOSER_MEMORY_LIMIT=-1
+  COMPOSER_MEMORY_LIMIT=-1 $(which composer) update
+  COMPOSER_STATUS=$?
+else
+  printf '\033[33m%s\033[m\n' '"composer.json" is not exist.'
+  COMPOSER_STATUS=0
 fi
 
 export REVIEWDOG_GITHUB_API_TOKEN="${INPUT_GITHUB_TOKEN}"
@@ -83,6 +88,8 @@ fi
 if [ ${PHPSTAN_STATUS} -ne 0 ] || [ ${PHPMD_STATUS} -ne 0 ] || [ ${PHPCS_STATUS} -ne 0 ] || [ ${PHINDER_STATUS} -ne 0 ]; then
   printf '\033[31m%s\033[m\n' 'Some analysis is failing. Please fix the code.'
   exit 1
+elif [ ${COMPOSER_STATUS} -ne 0 ]; then
+  printf '\033[31m%s\033[m\n' 'Failed composer update.'
 else
   printf '\033[32m%s\033[m\n' 'All analyzes completed successfully.'
   exit 0
