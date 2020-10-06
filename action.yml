@@ -50,6 +50,9 @@ inputs:
   dependency_update:
     description: 'Update dependencies if you have "composer.json" in workdir'
     default: true
+  debug:
+    description: 'Debug mode'
+    default: false
 runs:
   using: 'docker'
   image: 'Dockerfile'
