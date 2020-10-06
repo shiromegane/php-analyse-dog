@@ -34,7 +34,7 @@ inputs:
     default: false
   phpstan_args:
     description: 'PHPStan command args'
-    default: '. --error-format=raw --no-progress'
+    default: 'analyse . --error-format=raw --no-progress'
   phpmd_args:
     description: 'PHPMD command args'
     default: '. json cleancode,codesize,controversial,design,naming,unusedcode'
@@ -43,7 +43,7 @@ inputs:
     default: '. --report=json -q'
   phinder_args:
     description: 'Phinder command args'
-    default: 'find -f "json" .'
+    default: 'find . -f "json"'
   workdir:
     description: 'The directory from which to look for and run commands'
     default: '.'
