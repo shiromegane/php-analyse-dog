@@ -30,8 +30,7 @@ REVIEWDOG_OPTIONS="-reporter=${INPUT_REPORTER} -filter-mode=${INPUT_FILTER_MODE}
 
 if "${INPUT_ENABLE_PHPSTAN}"; then
   printf '\033[33m%s\033[m\n' 'Starting analyse by "PHPStan"'
-  phpstan analyse "${INPUT_PHPSTAN_ARGS}" \
-    | eval "reviewdog -name='PHPStan' -f=phpstan ${REVIEWDOG_OPTIONS}"
+  eval "phpstan analyse ${INPUT_PHPSTAN_ARGS} | reviewdog -name='PHPStan' -f=phpstan ${REVIEWDOG_OPTIONS}"
   PHPSTAN_STATUS=$?
   printf '\033[33m%s\033[m\n' 'Finished analyse by "PHPStan"'
 else
@@ -41,9 +40,8 @@ fi
 
 if "${INPUT_ENABLE_PHPMD}"; then
   printf '\033[33m%s\033[m\n' 'Starting analyse by "PHPMD"'
-  phpmd "${INPUT_PHPMD_ARGS}" \
-    | jq -r '.errors|to_entries[]|.value.fileName as $path|.value.message as $msg|"\($path):\($msg)"|match(", line: (\\d)").captures[].string as $line|match(", col: (\\d)").captures[].string as $col|"\($path):\($line):\($col):`Syntax error`<br>\($msg)"|gsub(", line:(.*)";"")' \
-    | eval "reviewdog -name='PHPMD' -efm='%f:%l:%c:%m' ${REVIEWDOG_OPTIONS}"
+  PHPMD_JQ_OPTIONS='.errors|to_entries[]|.value.fileName as $path|.value.message as $msg|"\($path):\($msg)"|match(", line: (\\d)").captures[].string as $line|match(", col: (\\d)").captures[].string as $col|"\($path):\($line):\($col):`Syntax error`<br>\($msg)"|gsub(", line:(.*)";"")'
+  eval "phpmd ${INPUT_PHPMD_ARGS} | jq -r ${PHPMD_JQ_OPTIONS} | reviewdog -name='PHPMD' -efm='%f:%l:%c:%m' ${REVIEWDOG_OPTIONS}"
   PHPMD_STATUS=$?
   printf '\033[33m%s\033[m\n' 'Finished analyse by "PHPMD"'
 else
@@ -53,9 +51,8 @@ fi
 
 if "${INPUT_ENABLE_PHPCS}"; then
   printf '\033[33m%s\033[m\n' 'Starting analyse by "PHP_CodeSniffer"'
-  phpcs "${INPUT_PHPCS_ARGS}" \
-    | jq -r '.files|to_entries[]|.key as $path|.value.messages[] as $msg|"\($path):\($msg.line):\($msg.column):`\($msg.source)`<br>\($msg.message)"' \
-    | eval "reviewdog -name='PHP_CodeSniffer' -efm='%f:%l:%c:%m' ${REVIEWDOG_OPTIONS}"
+  PHPCS_JQ_OPTIONS='.files|to_entries[]|.key as $path|.value.messages[] as $msg|"\($path):\($msg.line):\($msg.column):`\($msg.source)`<br>\($msg.message)"'
+  eval "phpcs ${INPUT_PHPCS_ARGS} | jq -r ${PHPCS_JQ_OPTIONS} | reviewdog -name='PHP_CodeSniffer' -efm='%f:%l:%c:%m' ${REVIEWDOG_OPTIONS}"
   PHPCS_STATUS=$?
   printf '\033[33m%s\033[m\n' 'Finished analyse by "PHP_CodeSniffer"'
 else
@@ -65,9 +62,8 @@ fi
 
 if "${INPUT_ENABLE_PHINDER}"; then
   printf '\033[33m%s\033[m\n' 'Starting analyse by "Phinder"'
-  phinder "${INPUT_PHINDER_ARGS}" \
-    | jq -r '.result|to_entries[]|.value.path as $path|.value.location.start[0] as $line|.value.location.start[1] as $col|.value.rule as $rule|"\($path):\($line):\($col):`\($rule.id)`<br>\($rule.message)"' \
-    | eval "reviewdog -name='Phinder' -efm='%f:%l:%c:%m' ${REVIEWDOG_OPTIONS}"
+  PHINDER_JQ_OPTIONS='.result|to_entries[]|.value.path as $path|.value.location.start[0] as $line|.value.location.start[1] as $col|.value.rule as $rule|"\($path):\($line):\($col):`\($rule.id)`<br>\($rule.message)"'
+  eval "phinder ${INPUT_PHINDER_ARGS} | jq -r ${PHINDER_JQ_OPTIONS} | reviewdog -name='Phinder' -efm='%f:%l:%c:%m' ${REVIEWDOG_OPTIONS}"
   PHINDER_STATUS=$?
   printf '\033[33m%s\033[m\n' 'Finished analyse by "Phinder"'
 else
