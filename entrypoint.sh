@@ -30,7 +30,7 @@ REVIEWDOG_OPTIONS="-reporter=${INPUT_REPORTER} -filter-mode=${INPUT_FILTER_MODE}
 
 if "${INPUT_ENABLE_PHPSTAN}"; then
   printf '\033[33m%s\033[m\n' 'Starting analyse by "PHPStan"'
-  phpstan ${INPUT_PHPSTAN_ARGS} | reviewdog -name='PHPStan' -f=phpstan ${REVIEWDOG_OPTIONS}
+  phpstan ${INPUT_PHPSTAN_ARGS} | reviewdog -name='PHPStan' -f=checkstyle ${REVIEWDOG_OPTIONS}
   PHPSTAN_STATUS=$?
   printf '\033[33m%s\033[m\n' 'Finished analyse by "PHPStan"'
 else
@@ -40,11 +40,17 @@ fi
 
 if "${INPUT_ENABLE_PHPMD}"; then
   printf '\033[33m%s\033[m\n' 'Starting analyse by "PHPMD"'
-  phpmd ${INPUT_PHPMD_ARGS} \
-    | jq -r '.errors|to_entries[]|.value.fileName as $path|.value.message as $msg|"\($path):\($msg)"|match(", line: (\\d)").captures[].string as $line|match(", col: (\\d)").captures[].string as $col|"\($path):\($line):\($col):`Syntax error`<br>\($msg)"|gsub(", line:(.*)";"")' \
-    | reviewdog -name='PHPMD' -efm='%f:%l:%c:%m' ${REVIEWDOG_OPTIONS}
-  PHPMD_STATUS=$?
-  printf '\033[33m%s\033[m\n' 'Finished analyse by "PHPMD"'
+  if [ ${PHPSTAN_STATUS} -eq 0 ]; then
+    phpmd ${INPUT_PHPMD_ARGS}
+    cat phpmd-results.json \
+      | jq -r '.errors|to_entries[]|.value.fileName as $path|.value.message as $msg|"\($path):\($msg)"|match(", line: (\\d)").captures[].string as $line|match(", col: (\\d)").captures[].string as $col|"\($path):\($line):\($col):`Syntax error`<br>\($msg)"|gsub(", line:(.*)";"")' \
+      | reviewdog -name='PHPMD' -efm='%f:%l:%c:%m' ${REVIEWDOG_OPTIONS}
+    PHPMD_STATUS=$?
+    printf '\033[33m%s\033[m\n' 'Finished analyse by "PHPMD"'
+  else
+    printf '\033[31m%s\033[m\n' '"PHPMD" cannot be executed unless the syntax check is passed.'
+    PHINDER_STATUS=0
+  fi
 else
   printf '\033[33m%s\033[m\n' 'Analyse by "PHPMD" is disabled'
   PHPMD_STATUS=0
@@ -64,11 +70,16 @@ fi
 
 if "${INPUT_ENABLE_PHINDER}"; then
   printf '\033[33m%s\033[m\n' 'Starting analyse by "Phinder"'
-  phinder ${INPUT_PHINDER_ARGS} \
-    | jq -r '.result|to_entries[]|.value.path as $path|.value.location.start[0] as $line|.value.location.start[1] as $col|.value.rule as $rule|"\($path):\($line):\($col):`\($rule.id)`<br>\($rule.message)"' \
-    | reviewdog -name='Phinder' -efm='%f:%l:%c:%m' ${REVIEWDOG_OPTIONS}
-  PHINDER_STATUS=$?
-  printf '\033[33m%s\033[m\n' 'Finished analyse by "Phinder"'
+  if [ ${PHPSTAN_STATUS} -eq 0 ] && [ ${PHPMD_STATUS} -eq 0 ]; then
+    phinder ${INPUT_PHINDER_ARGS} \
+      | jq -r '.result|to_entries[]|.value.path as $path|.value.location.start[0] as $line|.value.location.start[1] as $col|.value.rule as $rule|"\($path):\($line):\($col):`\($rule.id)`<br>\($rule.message)"' \
+      | reviewdog -name='Phinder' -efm='%f:%l:%c:%m' ${REVIEWDOG_OPTIONS}
+    PHINDER_STATUS=$?
+    printf '\033[33m%s\033[m\n' 'Finished analyse by "Phinder"'
+  else
+    printf '\033[31m%s\033[m\n' '"Phinder" cannot be executed unless the syntax check is passed.'
+    PHINDER_STATUS=0
+  fi
 else
   printf '\033[33m%s\033[m\n' 'Analyse by "Phinder" is disabled'
   PHINDER_STATUS=0
