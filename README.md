@@ -16,7 +16,7 @@ enable_phpstan|Enable PHPStan [true, false]|false|true
 enable_phpmd|Enable PHPMD [true, false]|false|false
 enable_phpcs|Enable PHP_CodeSniffer [true, false]|false|true
 enable_phinder|Enable Phinder [true, false]|false|false
-phpstan_args|PHPStan command args|false|'analyse . --error-format=raw --no-progress'
+phpstan_args|PHPStan command args|false|'analyse --error-format=raw --no-progress .'
 phpmd_args|PHPMD command args|false|'. json cleancode,codesize,controversial,design,naming,unusedcode'
 phpcs_args|PHP_CodeSniffer command args|false|'. --standard=PSR12 --report=json -q'
 phinder_args|Phinder command args|false|'find -f "json" .'

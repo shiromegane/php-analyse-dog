@@ -34,7 +34,7 @@ inputs:
     default: false
   phpstan_args:
     description: 'PHPStan command args'
-    default: 'analyse . --error-format=raw --no-progress'
+    default: 'analyse --error-format=raw --no-progress .'
   phpmd_args:
     description: 'PHPMD command args'
     default: '. json cleancode,codesize,controversial,design,naming,unusedcode'

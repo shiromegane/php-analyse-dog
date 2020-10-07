@@ -1,16 +1,10 @@
 #!/bin/sh -l
 set -x
 
-cd "${GITHUB_WORKSPACE}"
+export REVIEWDOG_GITHUB_API_TOKEN="${INPUT_GITHUB_TOKEN}"
 cd "${GITHUB_WORKSPACE}/${INPUT_WORKDIR}" || exit 1
 
-printf '\033[34m%s\033[m\n' "Working on $(pwd)"
-
-if "${INPUT_DEBUG}"; then
-  echo '[DEBUG START]--------------------------------------------------'
-  ls -la ./
-  echo '[DEBUG END]----------------------------------------------------'
-fi
+printf '\033[33m%s\033[m\n' "[PHP Analyse dog] Working on $(pwd)"
 
 printStartMessage() {
   printf '\033[33m%s\033[m\n' "[$1] Start analyse."
@@ -40,27 +34,24 @@ printResultMessage() {
   fi
 }
 
-debugResult() {
-  echo '[DEBUG START]--------------------------------------------------'
+debugCat() {
+  echo '[DEBUG]---------------------------------------------------------[START]'
   cat "$1"
-  echo '[DEBUG END]----------------------------------------------------'
+  echo '[DEBUG]-----------------------------------------------------------[END]'
 }
 
 if "${INPUT_DEPENDENCY_UPDATE}" && [ -e composer.json ]; then
-  printf '\033[33m%s\033[m\n' '"composer.json" is exist. Run install dependencies.'
-  export COMPOSER_MEMORY_LIMIT=-1
+  printf '\033[33m%s\033[m\n' 'Update dependencies as "composer.json" exists.'
   COMPOSER_MEMORY_LIMIT=-1 $(which composer) update
   COMPOSER_STATUS=$?
 else
   if "${INPUT_DEPENDENCY_UPDATE}"; then
-    printf '\033[33m%s\033[m\n' '"composer.json" is not exist.'
+    printf '\033[33m%s\033[m\n' 'Dependencies are not updated because "composer.json" does not exist.'
   else
-    printf '\033[33m%s\033[m\n' '"dependency_update" is false.'
+    printf '\033[33m%s\033[m\n' 'Dependencies will not be updated as the "dependency_update" option is false.'
   fi
   COMPOSER_STATUS=0
 fi
-
-export REVIEWDOG_GITHUB_API_TOKEN="${INPUT_GITHUB_TOKEN}"
 
 REVIEWDOG_OPTIONS="-reporter=${INPUT_REPORTER} -filter-mode=${INPUT_FILTER_MODE} -fail-on-error=${INPUT_FAIL_ON_ERROR} -level=${INPUT_LEVEL} ${INPUT_REVIEWDOG_ARGS}"
 
@@ -70,13 +61,14 @@ if "${INPUT_ENABLE_PHPSTAN}"; then
 
   printStartMessage ${TOOL_NAME}
 
+  phpstan clear-result-cache
   phpstan ${INPUT_PHPSTAN_ARGS} > ${RESULT_FILE}
 
   if "${INPUT_DEBUG}"; then
-    debugResult ${RESULT_FILE}
+    debugCat ${RESULT_FILE}
   fi
 
-  cat ${RESULT_FILE} | reviewdog -name="${TOOL_NAME}" -f=phpstan ${REVIEWDOG_OPTIONS}
+  cat "${RESULT_FILE}" | reviewdog -name="${TOOL_NAME}" -f=phpstan ${REVIEWDOG_OPTIONS}
 
   PHPSTAN_STATUS=$?
   printResultMessage ${TOOL_NAME} ${PHPSTAN_STATUS}
@@ -97,7 +89,7 @@ if "${INPUT_ENABLE_PHPMD}"; then
       > ${RESULT_FILE}
 
     if "${INPUT_DEBUG}"; then
-      debugResult ${RESULT_FILE}
+      debugCat ${RESULT_FILE}
     fi
 
     cat ${RESULT_FILE} | reviewdog -name="${TOOL_NAME}" -efm='%f:%l:%m' ${REVIEWDOG_OPTIONS}
@@ -122,7 +114,7 @@ if "${INPUT_ENABLE_PHPCS}"; then
     > ${RESULT_FILE}
 
   if "${INPUT_DEBUG}"; then
-    debugResult ${RESULT_FILE}
+    debugCat ${RESULT_FILE}
   fi
 
   cat ${RESULT_FILE} | reviewdog -name="${TOOL_NAME}" -efm='%f:%l:%c:%m' ${REVIEWDOG_OPTIONS}
@@ -145,7 +137,7 @@ if "${INPUT_ENABLE_PHINDER}"; then
       > ${RESULT_FILE}
 
     if "${INPUT_DEBUG}"; then
-      debugResult ${RESULT_FILE}
+      debugCat ${RESULT_FILE}
     fi
 
     cat ${RESULT_FILE} | reviewdog -name="${TOOL_NAME}" -efm='%f:%l:%c:%m' ${REVIEWDOG_OPTIONS}
