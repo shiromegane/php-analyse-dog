@@ -97,8 +97,8 @@ if "${INPUT_ENABLE_PHPMD}"; then
     PHPMD_STATUS=$?
     printResultMessage ${TOOL_NAME} ${PHPMD_STATUS}
   else
-    printSyntaxCheckMessage ${TOOL_NAME}
     PHPMD_STATUS=0
+    printSyntaxCheckMessage ${TOOL_NAME}
   fi
 else
   PHPMD_STATUS=0
