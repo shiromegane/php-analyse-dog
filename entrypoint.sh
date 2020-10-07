@@ -1,5 +1,4 @@
 #!/bin/sh -l
-set -x
 
 export REVIEWDOG_GITHUB_API_TOKEN="${INPUT_GITHUB_TOKEN}"
 cd "${GITHUB_WORKSPACE}/${INPUT_WORKDIR}" || exit 1
@@ -61,14 +60,14 @@ if "${INPUT_ENABLE_PHPSTAN}"; then
 
   printStartMessage ${TOOL_NAME}
 
-  phpstan clear-result-cache
+  phpstan clear-result-cache -q
   phpstan ${INPUT_PHPSTAN_ARGS} > ${RESULT_FILE}
 
   if "${INPUT_DEBUG}"; then
     debugCat ${RESULT_FILE}
   fi
 
-  cat "${RESULT_FILE}" | reviewdog -name="${TOOL_NAME}" -f=phpstan ${REVIEWDOG_OPTIONS}
+  cat < ${RESULT_FILE} | reviewdog -name="${TOOL_NAME}" -f=phpstan ${REVIEWDOG_OPTIONS}
 
   PHPSTAN_STATUS=$?
   printResultMessage ${TOOL_NAME} ${PHPSTAN_STATUS}
@@ -92,7 +91,7 @@ if "${INPUT_ENABLE_PHPMD}"; then
       debugCat ${RESULT_FILE}
     fi
 
-    cat ${RESULT_FILE} | reviewdog -name="${TOOL_NAME}" -efm='%f:%l:%m' ${REVIEWDOG_OPTIONS}
+    cat < ${RESULT_FILE} | reviewdog -name="${TOOL_NAME}" -efm='%f:%l:%m' ${REVIEWDOG_OPTIONS}
     PHPMD_STATUS=$?
     printResultMessage ${TOOL_NAME} ${PHPMD_STATUS}
   else
@@ -117,7 +116,7 @@ if "${INPUT_ENABLE_PHPCS}"; then
     debugCat ${RESULT_FILE}
   fi
 
-  cat ${RESULT_FILE} | reviewdog -name="${TOOL_NAME}" -efm='%f:%l:%c:%m' ${REVIEWDOG_OPTIONS}
+  cat < ${RESULT_FILE} | reviewdog -name="${TOOL_NAME}" -efm='%f:%l:%c:%m' ${REVIEWDOG_OPTIONS}
   PHPCS_STATUS=$?
   printResultMessage ${TOOL_NAME} ${PHPCS_STATUS}
 else
@@ -140,7 +139,7 @@ if "${INPUT_ENABLE_PHINDER}"; then
       debugCat ${RESULT_FILE}
     fi
 
-    cat ${RESULT_FILE} | reviewdog -name="${TOOL_NAME}" -efm='%f:%l:%c:%m' ${REVIEWDOG_OPTIONS}
+    cat < ${RESULT_FILE} | reviewdog -name="${TOOL_NAME}" -efm='%f:%l:%c:%m' ${REVIEWDOG_OPTIONS}
     PHINDER_STATUS=$?
     printResultMessage ${TOOL_NAME} ${PHINDER_STATUS}
   else
