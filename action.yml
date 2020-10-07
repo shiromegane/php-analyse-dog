@@ -20,27 +20,21 @@ inputs:
   reviewdog_args:
     description: 'Additional reviewdog options'
     default: ''
-  enable_phpstan:
-    description: 'Enable PHPStan [true, false]'
+  enable_phpcs:
+    description: 'Enable PHP_CodeSniffer [true, false]'
     default: true
   enable_phpmd:
     description: 'Enable PHPMD [true, false]'
     default: false
-  enable_phpcs:
-    description: 'Enable PHP_CodeSniffer [true, false]'
-    default: true
   enable_phinder:
     description: 'Enable Phinder [true, false]'
     default: false
-  phpstan_args:
-    description: 'PHPStan command args'
-    default: 'analyse --error-format=raw --no-progress .'
-  phpmd_args:
-    description: 'PHPMD command args'
-    default: '. json cleancode,codesize,controversial,design,naming,unusedcode'
   phpcs_args:
     description: 'PHP_CodeSniffer command args'
     default: '. --standard=PSR12 --report=json -q'
+  phpmd_args:
+    description: 'PHPMD command args'
+    default: '. json cleancode,codesize,controversial,design,naming,unusedcode'
   phinder_args:
     description: 'Phinder command args'
     default: 'find . -f "json"'
