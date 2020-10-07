@@ -37,7 +37,7 @@ inputs:
     default: 'analyse . --error-format=raw --no-progress'
   phpmd_args:
     description: 'PHPMD command args'
-    default: '. json cleancode,codesize,controversial,design,naming,unusedcode --reportfile phpmd-results.json'
+    default: '. json cleancode,codesize,controversial,design,naming,unusedcode'
   phpcs_args:
     description: 'PHP_CodeSniffer command args'
     default: '. --standard=PSR12 --report=json -q'
@@ -49,9 +49,9 @@ inputs:
     default: '.'
   dependency_update:
     description: 'Update dependencies if you have "composer.json" in workdir'
-    default: true
+    default: false
   debug:
-    description: 'Debug mode'
+    description: 'Output debug messages'
     default: false
 runs:
   using: 'docker'
