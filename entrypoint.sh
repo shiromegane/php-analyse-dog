@@ -26,13 +26,18 @@ fi
 
 export REVIEWDOG_GITHUB_API_TOKEN="${INPUT_GITHUB_TOKEN}"
 
-REVIEWDOG_OPTIONS="-reporter=${INPUT_REPORTER} -filter-mode=${INPUT_FILTER_MODE} -fail-on-error=${INPUT_FAIL_ON_ERROR} -level=${INPUT_LEVEL} ${INPUT_REVIEWDOG_ARGS}"
+GIT_DIFF='git diff master'
+REVIEWDOG_OPTIONS="-diff=${GIT_DIFF} -reporter=${INPUT_REPORTER} -filter-mode=${INPUT_FILTER_MODE} -fail-on-error=${INPUT_FAIL_ON_ERROR} -level=${INPUT_LEVEL} ${INPUT_REVIEWDOG_ARGS}"
 
 if "${INPUT_ENABLE_PHPSTAN}"; then
   printf '\033[33m%s\033[m\n' 'Starting analyse by "PHPStan"'
-  phpstan ${INPUT_PHPSTAN_ARGS} | reviewdog -name='PHPStan' -f=checkstyle ${REVIEWDOG_OPTIONS}
+  phpstan ${INPUT_PHPSTAN_ARGS} | reviewdog -name='PHPStan' -f=phpstan ${REVIEWDOG_OPTIONS}
   PHPSTAN_STATUS=$?
-  printf '\033[33m%s\033[m\n' 'Finished analyse by "PHPStan"'
+  if [ ${PHPSTAN_STATUS} -ne 0 ]; then
+    printf '\033[31m%s\033[m\n' '"PHPStan" detected some errors and warnings'
+  else
+    printf '\033[33m%s\033[m\n' 'Finished analyse by "PHPStan"'
+  fi
 else
   printf '\033[33m%s\033[m\n' 'Analyse by "PHPStan" is disabled'
   PHPSTAN_STATUS=0
@@ -46,7 +51,11 @@ if "${INPUT_ENABLE_PHPMD}"; then
       | jq -r '.errors|to_entries[]|.value.fileName as $path|.value.message as $msg|"\($path):\($msg)"|match(", line: (\\d)").captures[].string as $line|match(", col: (\\d)").captures[].string as $col|"\($path):\($line):\($col):`Syntax error`<br>\($msg)"|gsub(", line:(.*)";"")' \
       | reviewdog -name='PHPMD' -efm='%f:%l:%c:%m' ${REVIEWDOG_OPTIONS}
     PHPMD_STATUS=$?
-    printf '\033[33m%s\033[m\n' 'Finished analyse by "PHPMD"'
+    if [ ${PHPMD_STATUS} -ne 0 ]; then
+      printf '\033[31m%s\033[m\n' '"PHPMD" detected some errors and warnings'
+    else
+      printf '\033[33m%s\033[m\n' 'Finished analyse by "PHPMD"'
+    fi
   else
     printf '\033[31m%s\033[m\n' '"PHPMD" cannot be executed unless the syntax check is passed.'
     PHINDER_STATUS=0
@@ -62,7 +71,11 @@ if "${INPUT_ENABLE_PHPCS}"; then
     | jq -r '.files|to_entries[]|.key as $path|.value.messages[] as $msg|"\($path):\($msg.line):\($msg.column):`\($msg.source)`<br>\($msg.message)"' \
     | reviewdog -name='PHP_CodeSniffer' -efm='%f:%l:%c:%m' ${REVIEWDOG_OPTIONS}
   PHPCS_STATUS=$?
-  printf '\033[33m%s\033[m\n' 'Finished analyse by "PHP_CodeSniffer"'
+  if [ ${PHPCS_STATUS} -ne 0 ]; then
+    printf '\033[31m%s\033[m\n' '"PHP_CodeSniffer" detected some errors and warnings'
+  else
+    printf '\033[33m%s\033[m\n' 'Finished analyse by "PHP_CodeSniffer"'
+  fi
 else
   printf '\033[33m%s\033[m\n' 'Analyse by "PHP_CodeSniffer" is disabled'
   PHPCS_STATUS=0
@@ -75,7 +88,11 @@ if "${INPUT_ENABLE_PHINDER}"; then
       | jq -r '.result|to_entries[]|.value.path as $path|.value.location.start[0] as $line|.value.location.start[1] as $col|.value.rule as $rule|"\($path):\($line):\($col):`\($rule.id)`<br>\($rule.message)"' \
       | reviewdog -name='Phinder' -efm='%f:%l:%c:%m' ${REVIEWDOG_OPTIONS}
     PHINDER_STATUS=$?
-    printf '\033[33m%s\033[m\n' 'Finished analyse by "Phinder"'
+    if [ ${PHINDER_STATUS} -ne 0 ]; then
+      printf '\033[31m%s\033[m\n' '"Phinder" detected some errors and warnings'
+    else
+      printf '\033[33m%s\033[m\n' 'Finished analyse by "Phinder"'
+    fi
   else
     printf '\033[31m%s\033[m\n' '"Phinder" cannot be executed unless the syntax check is passed.'
     PHINDER_STATUS=0

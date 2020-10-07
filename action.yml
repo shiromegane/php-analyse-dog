@@ -34,13 +34,13 @@ inputs:
     default: false
   phpstan_args:
     description: 'PHPStan command args'
-    default: 'analyse . --error-format=checkstyle --no-progress'
+    default: 'analyse . --error-format=raw --no-progress'
   phpmd_args:
     description: 'PHPMD command args'
     default: '. json cleancode,codesize,controversial,design,naming,unusedcode --reportfile phpmd-results.json'
   phpcs_args:
     description: 'PHP_CodeSniffer command args'
-    default: '. --report=json -q'
+    default: '. --standard=PSR12 --report=json -q'
   phinder_args:
     description: 'Phinder command args'
     default: 'find . -f "json"'
