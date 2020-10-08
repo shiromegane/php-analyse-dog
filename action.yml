@@ -20,13 +20,13 @@ inputs:
   reviewdog_args:
     description: 'Additional reviewdog options'
     default: ''
-  enable_phpcs:
+  phpcs:
     description: 'Enable PHP_CodeSniffer [true, false]'
     default: true
-  enable_phpmd:
+  phpmd:
     description: 'Enable PHPMD [true, false]'
     default: false
-  enable_phinder:
+  phinder:
     description: 'Enable Phinder [true, false]'
     default: false
   phpcs_args:
@@ -34,14 +34,14 @@ inputs:
     default: '. --standard=PSR12 --report=json -q'
   phpmd_args:
     description: 'PHPMD command args'
-    default: '. json cleancode,codesize,controversial,design,naming,unusedcode'
+    default: '. json cleancode,codesize,controversial,design,naming,unusedcode --suffixes php'
   phinder_args:
     description: 'Phinder command args'
     default: 'find . -f "json"'
   workdir:
     description: 'The directory from which to look for and run commands'
     default: '.'
-  dependency_update:
+  update_dependency:
     description: 'Update dependencies if you have "composer.json" in workdir'
     default: false
   debug:

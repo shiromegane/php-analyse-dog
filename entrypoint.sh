@@ -43,12 +43,12 @@ debugCat() {
   echo '[DEBUG]-----------------------------------------------------------[END]'
 }
 
-if "${INPUT_DEPENDENCY_UPDATE}" && [ -e composer.json ]; then
+if "${INPUT_UPDATE_DEPENDENCY}" && [ -e composer.json ]; then
   printf '\033[33m%s\033[m\n' 'Update dependencies as "composer.json" exists.'
   COMPOSER_MEMORY_LIMIT=-1 $(which composer) update
   COMPOSER_STATUS=$?
 else
-  if "${INPUT_DEPENDENCY_UPDATE}"; then
+  if "${INPUT_UPDATE_DEPENDENCY}"; then
     printf '\033[33m%s\033[m\n' 'Dependencies are not updated because "composer.json" does not exist.'
   else
     printf '\033[33m%s\033[m\n' 'Dependencies will not be updated as the "dependency_update" option is false.'
@@ -59,7 +59,7 @@ fi
 REVIEWDOG_OPTIONS="-reporter=${INPUT_REPORTER} -filter-mode=${INPUT_FILTER_MODE} -fail-on-error=${INPUT_FAIL_ON_ERROR} -level=${INPUT_LEVEL} ${INPUT_REVIEWDOG_ARGS}"
 
 TOOL_NAME='PHP_CodeSniffer'
-if "${INPUT_ENABLE_PHPCS}"; then
+if "${INPUT_PHPCS}"; then
   printStartMessage ${TOOL_NAME}
   RESULT_FILE="${TOOL_NAME}_Results"
 
@@ -80,7 +80,7 @@ else
 fi
 
 TOOL_NAME='PHPMD'
-if "${INPUT_ENABLE_PHPMD}"; then
+if "${INPUT_PHPMD}"; then
   printStartMessage ${TOOL_NAME}
   RESULT_FILE="${TOOL_NAME}_Results"
 
@@ -106,7 +106,7 @@ else
 fi
 
 TOOL_NAME='Phinder'
-if "${INPUT_ENABLE_PHINDER}"; then
+if "${INPUT_PHINDER}"; then
   RESULT_FILE="${TOOL_NAME}_Results"
   printStartMessage ${TOOL_NAME}
 
